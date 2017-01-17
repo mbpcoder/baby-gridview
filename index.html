@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <script src="gridview.js"></script>
+</head>
+<body>
+<div class="grid" id="UsersGridView"></div>
+
+<script>
+
+    var gridview = new Gridview(document.getElementById('UsersGridView'), {
+        dataSourceUrl: '/admin/users/grid',
+        extraData: {_token: '{{csrf_token()}}'}
+    });
+    gridview.addFilter('first_name', 'string', '=', 'mahdi', undefined);
+    gridview.addFilter('last_name', 'string', '=', 'bagheri', undefined);
+    gridview.send(function (users) {
+        // show data here
+        console.log(users);
+    });
+
+</script>
+</body>
+</html>
