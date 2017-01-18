@@ -12,14 +12,13 @@
 
     var gridview = new Gridview(document.getElementById('UsersGridView'), {
         dataSourceUrl: '/admin/users/grid',
-        extraData: {_token: '{{csrf_token()}}'}
+        onload: function (users) {
+            console.log(users);
+        }
     });
     gridview.addFilter('first_name', 'string', '=', 'mahdi', undefined);
     gridview.addFilter('last_name', 'string', '=', 'bagheri', undefined);
-    gridview.send(function (users) {
-        // show data here
-        console.log(users);
-    });
+    gridview.send();
 
 </script>
 </body>

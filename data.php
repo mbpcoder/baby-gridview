@@ -3,42 +3,29 @@
 $req = json_decode($_POST['req']);
 
 $filters = $req->filters;
+$sorts = $req->sorts;
 
-$users = getUsers();
+$users = getUsers($filters, $sorts);
 
-function processFilters()
+return $users;
+
+function getUsers($filters, $sorts)
 {
+    $query = 'SELECT * FROM users';
 
-}
+    $query = processFilters($query, $filters);
 
-function processSorts()
-{
-
-}
-
-function getUsers()
-{
-    $users = [];
-    $user = new stdClass();
-    $user->name = 'ali';
-    $user->age = 20;
-    $users[] = $user;
-
-    $user = new stdClass();
-    $user->name = 'reza';
-    $user->age = 39;
-    $users[] = $user;
-
-    $user = new stdClass();
-    $user->name = 'mahdi';
-    $user->age = 32;
-    $users[] = $user;
-
-    $user = new stdClass();
-    $user->name = 'hamid';
-    $user->age = 28;
-    $users[] = $user;
+    $users = processSorts($query, $sorts);
 
     return $users;
+}
+
+function processFilters($data, $filters)
+{
+
+}
+
+function processSorts($data, $sorts)
+{
 
 }
