@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Document</title>
+    <script src="jquery.min.js"></script>
     <script src="gridview.js"></script>
 </head>
 <body>
@@ -11,13 +12,12 @@
 <script>
 
     var gridview = new Gridview(document.getElementById('UsersGridView'), {
-        dataSourceUrl: '/admin/users/grid',
+        dataSourceUrl: '/data.php',
         onload: function (users) {
             console.log(users);
         }
     });
-    gridview.addFilter('first_name', 'string', '=', 'mahdi', undefined);
-    gridview.addFilter('last_name', 'string', '=', 'bagheri', undefined);
+    gridview.addFilter('name', 'string', '=', 'mahdi', undefined);
     gridview.send();
 
 </script>

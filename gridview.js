@@ -4,9 +4,11 @@ var Gridview = function (element, options) {
 
     // options
     var $containerElement = $(element) || undefined;
+
+    var itemPerPage = options.itemPerPage || 15;
     var onload = options.onload || new Function();
     var dataSourceUrl = options.dataSourceUrl;
-    var extraData = options.extraData;
+    var extraData = options.extraData || {};
 
     // variables
     var resultRows = [];
@@ -62,8 +64,8 @@ var Gridview = function (element, options) {
         params['req'] = JSON.stringify({
             filters: filters,
             sorts: sorts,
+            itemPerPage: itemPerPage
         });
-
         $.post(dataSourceUrl, params, function (data) {
             resultRows = data;
             onload(resultRows);
