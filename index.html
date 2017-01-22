@@ -3,21 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <title>Document</title>
+    <style>
+        .hidden {
+            display: none;
+        }
+
+        table {
+            border-collapse: collapse;
+            border-spacing: 0;
+            width: 100%;
+            display: table;
+            border: 1px solid #ccc !important;
+        }
+
+        tbody tr:nth-child(odd) {
+            background-color: #f1f1f1
+        }
+
+        table td, table th {
+            padding: 8px 8px;
+            display: table-cell;
+            text-align: left;
+            vertical-align: top
+        }
+        #pagination{
+            display: inline-block;
+            padding: 0;
+            margin: 0;
+        }
+        #pagination li {
+            display: inline;
+        }
+        #pagination li a {
+            text-decoration: none;
+            color: #000;
+            float: left;
+            padding: 8px 16px;
+        }
+        #pagination a:hover{
+            transition: background-color .25s,color .15s,box-shadow .15s,opacity .25s,filter .25s,border .15s;
+        }
+    </style>
     <script src="jquery.min.js"></script>
     <script src="gridview.js"></script>
 </head>
 <body>
-<div class="grid" id="UsersGridView"></div>
+<div class="grid" id="UsersGridView">
+    <table class="w3-table w3-striped w3-border">
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Email</th>
+            <th>Gender</th>
+            <th>Age</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+    </table>
+    <div id="pagination"></div>
+</div>
 
 <script>
 
     var gridview = new Gridview(document.getElementById('UsersGridView'), {
         dataSourceUrl: '/data.php',
+        paginationContainerElement: document.getElementById('pagination'),
         onload: function (users) {
             console.log(users);
+            //remove filters
+            gridview.removeAllFilters();
+            // process the data
+            var html = '';
+            for (var index in users) {
+                var user = users[index];
+                html += '<tr>';
+                html += '<td class="id hidden">' + user.id + '</td>';
+                html += '<td>' + user.row_number + '</td>';
+                html += '<td>' + user.first_name + '</td>';
+                html += '<td>' + user.last_name + '</td>';
+                html += '<td>' + user.email + '</td>';
+                html += '<td>' + user.gender + '</td>';
+                html += '<td>' + user.age + '</td>';
+                html += '</tr>';
+            }
+            $('.grid table tbody').html(html);
+
         }
     });
-    gridview.addFilter('name', 'string', '=', 'mahdi', undefined);
+    gridview.addFilterContain('first_name', 'string', 'a');
     gridview.send();
 
 </script>
