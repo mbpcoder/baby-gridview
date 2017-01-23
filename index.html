@@ -4,8 +4,27 @@
     <meta charset="UTF-8">
     <title>Document</title>
     <style>
-        .hidden {
-            display: none;
+        .form-group {
+            width: 260px;
+            display: inline-block;
+            padding: 5px;
+            margin-bottom: 5px;
+            margin-top: 5px;
+        }
+
+        .form-group label {
+            width: 75px;
+            display: inline-block;
+        }
+
+        input{
+            width: 169px;
+        }
+
+        select {
+            width: 169px;
+            border-width: 1px;
+            padding: 2px;
         }
 
         table {
@@ -26,76 +45,164 @@
             text-align: left;
             vertical-align: top
         }
-        #pagination{
+
+        #UsersPagination {
             display: inline-block;
             padding: 0;
             margin: 0;
         }
-        #pagination li {
+
+        #UsersPagination li.active a {
+            background-color: #ddd;;
+        }
+
+        #UsersPagination li {
             display: inline;
         }
-        #pagination li a {
+
+        #UsersPagination li a {
             text-decoration: none;
             color: #000;
             float: left;
             padding: 8px 16px;
         }
-        #pagination a:hover{
-            transition: background-color .25s,color .15s,box-shadow .15s,opacity .25s,filter .25s,border .15s;
+
+        #UsersPagination a:hover {
+            transition: background-color .25s, color .15s, box-shadow .15s, opacity .25s, filter .25s, border .15s;
         }
+
+        /*w3-table w3-striped w3-border*/
     </style>
     <script src="jquery.min.js"></script>
     <script src="gridview.js"></script>
 </head>
 <body>
-<div class="grid" id="UsersGridView">
-    <table class="w3-table w3-striped w3-border">
-        <thead>
-        <tr>
-            <th>#</th>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Email</th>
-            <th>Gender</th>
-            <th>Age</th>
-        </tr>
-        </thead>
-        <tbody>
 
-        </tbody>
-    </table>
-    <div id="pagination"></div>
+<div class="form-group">
+    <label for="first_name">First Name</label>
+    <input type="text" name="first_name" id="first_name">
 </div>
+
+<div class="form-group">
+    <label for="first_name">Last Name</label>
+    <input type="text" name="last_name" id="last_name">
+</div>
+
+<div class="form-group">
+    <label for="email">Email</label>
+    <input type="text" name="email" id="email">
+</div>
+<div class="form-group">
+    <label for="gender">Gender</label>
+    <select name="gender" id="gender">
+        <option value="all">All</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+    </select>
+</div>
+
+<div class="form-group">
+    <label for="age">Age</label>
+    <input type="number" name="age" id="age">
+</div>
+
+<div class="form-group">
+    <input type="button" value="Search" id="ButtonSearch">
+</div>
+
+<div id="UsersGridView"></div>
+<div id="UsersPagination"></div>
 
 <script>
 
-    var gridview = new Gridview(document.getElementById('UsersGridView'), {
+    var gridview = new Gridview({
         dataSourceUrl: '/data.php',
-        paginationContainerElement: document.getElementById('pagination'),
+        gridviewContainerId: 'UsersGridView',
+        paginationContainerId: 'UsersPagination',
+        autoIncrementColumn: true,
+        autoIncrementColumnName: '#',
         onload: function (users) {
+            // do what ever you like
             console.log(users);
-            //remove filters
-            gridview.removeAllFilters();
-            // process the data
-            var html = '';
-            for (var index in users) {
-                var user = users[index];
-                html += '<tr>';
-                html += '<td class="id hidden">' + user.id + '</td>';
-                html += '<td>' + user.row_number + '</td>';
-                html += '<td>' + user.first_name + '</td>';
-                html += '<td>' + user.last_name + '</td>';
-                html += '<td>' + user.email + '</td>';
-                html += '<td>' + user.gender + '</td>';
-                html += '<td>' + user.age + '</td>';
-                html += '</tr>';
-            }
-            $('.grid table tbody').html(html);
-
         }
     });
-    gridview.addFilterContain('first_name', 'string', 'a');
+
+    gridview.addColumn({
+        name: 'first_name',
+        caption: 'First Name',
+        type: 'string',
+        filter: {
+            oprand1: {
+                elementId: 'first_name', // element id
+                ignoreValue: '', // don't filter on this
+            },
+            operator: 'contain' // filter operator
+        }
+    });
+    gridview.addColumn({
+        name: 'last_name',
+        caption: 'Last Name',
+        type: 'string',
+        filter: {
+            oprand1: {
+                elementId: 'last_name', // element id
+                ignoreValue: '', // don't filter on this
+            },
+            operator: 'contain' // filter operator
+        }
+    });
+    gridview.addColumn({
+        name: 'email',
+        caption: 'Email',
+        type: 'string',
+        filter: {
+            oprand1: {
+                elementId: 'email', // element id
+                ignoreValue: '', // don't filter on this
+            },
+            operator: 'contain' // filter operator
+        }
+    });
+    gridview.addColumn({
+        name: 'gender',
+        caption: 'Gender',
+        type: 'string',
+        filter: {
+            oprand1: {
+                elementId: 'gender', // element id
+                ignoreValue: 'all', // don't filter on this
+            },
+            operator: 'equal' // filter operator
+        }
+    });
+    gridview.addColumn({
+        name: 'age',
+        caption: 'Age',
+        type: 'number',
+        filter: {
+            oprand1: {
+                elementId: 'age', // element id
+                ignoreValue: '', // don't filter on this
+            },
+            operator: 'equal' // filter operator
+        }
+    });
+    gridview.addColumn({
+        name: 'action',
+        caption: 'Action',
+        type: 'string',
+        render: function (data, row) {
+            var html = '';
+            html += '<a href="#"> Edit</a> |';
+            html += '<a href="#"> Delete</a>';
+            return html;
+        }
+    });
     gridview.send();
+
+    $('#ButtonSearch').click(function (e) {
+        gridview.send();
+    });
 
 </script>
 </body>
