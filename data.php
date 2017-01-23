@@ -6,6 +6,7 @@ $filters = $req->filters;
 $sorts = $req->sorts;
 $pagination = $req->pagination;
 
+//var_dump($pagination);
 
 $db = new PDO('sqlite:database.sqlite');
 $query = 'SELECT * FROM users';
@@ -19,8 +20,14 @@ $pagination->total = (integer)$result->fetchColumn();
 $query = $query . ' limit ' . $pagination->per_page;
 $query = $query . ' offset ' . $pagination->from;
 
+//var_dump($query);
 $result = $db->query($query, PDO::FETCH_ASSOC);
+//var_dump($result);
+
 $users = $result->fetchAll();
+
+
+
 
 header('Content-Type: application/json');
 echo json_encode([
@@ -32,16 +39,22 @@ echo json_encode([
 function processFilters($query, $filters)
 {
     if (count($filters) > 0) {
-        foreach ($filters as $filter) {
+        $query .= ' WHERE ';
+        for ($i = 0; $i < count($filters); $i++) {
+            $filter = $filters[$i];
+            if ($i != 0) {
+                $query .= ' AND ';
+            }
             switch ($filter->operator) {
                 case 'equal':
-                    $query .= ' where ' . $filter->name . '=' . "'" . $filter->oprand1 . "'";
+                    $query .= $filter->name . '=' . "'" . $filter->oprand1 . "'";
                     break;
                 case 'contain':
-                    $query .= ' where ' . $filter->name . ' LIKE' . " '%" . $filter->oprand1 . "%'";
+                    $query .= $filter->name . ' LIKE' . " '%" . $filter->oprand1 . "%'";
                     break;
             }
         }
+
     }
 
     return $query;
