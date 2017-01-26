@@ -43,9 +43,9 @@ var Gridview = function (options) {
     var addColumn = function (column) {
         columns.push(column);
     };
-    var getValue = function (element) {
-
-        return $('#' + element).val();
+    var getValue = function (elementId) {
+        var value =  $('#' + elementId).val();
+        return str.trim(value);
         //switch (element.type) {
         //
         //}
