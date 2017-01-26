@@ -45,7 +45,7 @@ var Gridview = function (options) {
     };
     var getValue = function (elementId) {
         var value =  $('#' + elementId).val();
-        return str.trim(value);
+        return value.trim(value);
         //switch (element.type) {
         //
         //}
