@@ -44,7 +44,7 @@ var Gridview = function (options) {
         columns.push(column);
     };
     var getValue = function (elementId) {
-        var value =  $('#' + elementId).val();
+        var value = $('#' + elementId).val();
         return value.trim(value);
         //switch (element.type) {
         //
@@ -136,11 +136,11 @@ var Gridview = function (options) {
                 var th = '';
                 switch (column.type) {
                     case 'hidden':
-                        th = '<th style="display: none">' + column.caption + '</th>';
+                        th = '<th class="gridview-column-header-' + column.name + '" style="display: none">' + column.caption + '</th>';
                         break;
                     case 'string':
                     case 'number':
-                        th = '<th>' + column.caption + '</th>';
+                        th = '<th class="gridview-column-header-' + column.name + '">' + column.caption + '</th>';
                         break;
                 }
                 tr += th
@@ -162,15 +162,15 @@ var Gridview = function (options) {
                     var column = columns[i];
                     var td = '';
                     if (column.render) {
-                        td = '<td>' + column.render(row[column.name], row) + '</td>';
+                        td = '<td class="gridview-column-' + column.name + '">' + column.render(row[column.name], row) + '</td>';
                     } else {
                         switch (column.type) {
                             case 'hidden':
-                                td = '<td style="display: none">' + row[column.name] + '</td>';
+                                td = '<td class="gridview-column-' + column.name + '" style="display: none">' + row[column.name] + '</td>';
                                 break;
                             case 'string':
                             case 'number':
-                                td = '<td>' + row[column.name] + '</td>';
+                                td = '<td class="gridview-column-' + column.name + '">' + row[column.name] + '</td>';
                                 break;
                         }
                     }
