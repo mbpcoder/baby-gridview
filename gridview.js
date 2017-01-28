@@ -4,25 +4,53 @@ var Gridview = function (options) {
 
     // options
     var $containerElement = $('#' + options.gridviewContainerId) || undefined;
-    var $paginationContainerElement = $('#' + options.paginationContainerId) || undefined;
 
-    if ($paginationContainerElement) {
-        $paginationContainerElement.on('click', 'a', function (e) {
+    var autoGridTemplate = options.autoGridTemplate || true;
+    var autoPagination = options.autoPagination || true;
+
+    if ($containerElement) {
+        $containerElement.on('click', 'ul.pagination li a', function (e) {
             var $this = $(this);
-            $paginationContainerElement.closest('li').removeClass('active');
+            $containerElement.find('ul.pagination li').removeClass('active');
             $this.closest('li').addClass('active');
             pagination.current_page = parseInt($this.text());
-            pagination.from = ((pagination.current_page - 1) * pagination.per_page) + 1
+            pagination.from = ((pagination.current_page - 1) * pagination.per_page);
             pagination.to = pagination.from + pagination.per_page;
             send();
         });
+
+        $containerElement.on('click', '.js-sort', function (e) {
+            var $this = $(this);
+            $this.removeClass('js-sort').addClass('js-sort-ascending');
+            $this.removeClass('mdi-sort').addClass('mdi-sort-ascending');
+
+            addAscendingSort(name);
+            //send();
+        });
+
+        $containerElement.on('click', '.js-sort-ascending', function (e) {
+            var $this = $(this);
+            console.log(this)
+            $this.removeClass('js-sort-ascending').addClass('js-sort-descending');
+            $this.removeClass('mdi-sort-ascending').addClass('mdi-sort-descending');
+        });
+
+        $containerElement.on('click', '.js-sort-descending', function (e) {
+            var $this = $(this);
+            console.log(this)
+            $this.removeClass('js-sort-descending').addClass('js-sort');
+            $this.removeClass('mdi-sort-descending').addClass('mdi-sort');
+        });
     }
+
     var autoIncrementColumn = options.autoIncrementColumn || true;
     var autoIncrementColumnName = options.autoIncrementColumnName || '#';
 
     var onload = options.onload || new Function();
     var dataSourceUrl = options.dataSourceUrl;
     var extraData = options.extraData || {};
+
+    var gridviewClassName = 'anonymous-gridview';
 
     // variables
     var columns = [];
@@ -39,16 +67,16 @@ var Gridview = function (options) {
 
     // private functions
 
-
     var addColumn = function (column) {
         columns.push(column);
     };
     var getValue = function (elementId) {
         var value = $('#' + elementId).val();
-        return value.trim(value);
-        //switch (element.type) {
-        //
-        //}
+        if (value) {
+            value = value.trim(value);
+        }
+        return value;
+
     };
 
     // sorting
@@ -98,8 +126,106 @@ var Gridview = function (options) {
     };
 
     // Display Grid View
+
+    var createGridView = function () {
+        if ($containerElement) {
+            $containerElement.html('');
+            var html = '<div class="' + gridviewClassName + ' table-responsive">';
+            html += createGridviewHeader();
+            html += createGridviewTable();
+            html += createPagination();
+            html += '</div>';
+            $containerElement.html(html);
+        }
+    };
+    var createGridviewHeader = function () {
+        var html = '<div class="gridview-header"></div>';
+        return '';
+    };
+
+    var createGridViewTableHeader = function () {
+        // create table head
+        var html = '';
+        if (autoIncrementColumn) {
+            html += '<th>' + autoIncrementColumnName + '</th>';
+        }
+
+        for (var i in columns) {
+            var column = columns[i];
+
+            var th = '';
+            switch (column.type) {
+                case 'hidden':
+                    th = '<th class="gridview-column-header-' + column.name + '" style="display: none">' + column.caption;
+                    break;
+                case 'string':
+                case 'number':
+                    th = '<th class="gridview-column-header-' + column.name + '">' + column.caption;
+                    break;
+            }
+
+            if (column.sort) {
+                th += '<i class="mdi mdi-sort pull-left js-sort"></i></th>'
+            } else {
+                th += '</th>'
+            }
+
+
+            html += th
+        }
+
+        html = '<thead><tr>' + html + '</tr></thead>';
+        return html;
+    };
+    var createGridviewTable = function () {
+        if (autoGridTemplate) {
+            var tableHtml = '<table class="table table-striped">';
+            tableHtml += createGridViewTableHeader();
+
+            // create table body
+            tableHtml += '<tbody>';
+            var autoIncrementNumber = (pagination.current_page - 1) * pagination.per_page;
+            for (var index in resultRows) {
+                var row = resultRows[index];
+                autoIncrementNumber = autoIncrementNumber + 1;
+                row.autoIncrementNumber = autoIncrementNumber;
+
+                tableHtml += createGridViewTableRow(row);
+            }
+            tableHtml += '</tbody>';
+            tableHtml += '</table>';
+            return tableHtml;
+        }
+    };
+    var createGridViewTableRow = function (row) {
+        var tr = '<tr>';
+        if (autoIncrementColumn) {
+            tr += '<td>' + row.autoIncrementNumber + '</td>';
+        }
+        for (var i in columns) {
+
+            var column = columns[i];
+            var td = '';
+            if (column.render) {
+                td = '<td class="gridview-column-' + column.name + '">' + column.render(row[column.name], row) + '</td>';
+            } else {
+                switch (column.type) {
+                    case 'hidden':
+                        td = '<td class="gridview-column-' + column.name + '" style="display: none">' + row[column.name] + '</td>';
+                        break;
+                    case 'string':
+                    case 'number':
+                        td = '<td class="gridview-column-' + column.name + '">' + row[column.name] + '</td>';
+                        break;
+                }
+            }
+            tr += td;
+        }
+        tr += '</tr>';
+        return tr;
+    };
     var createPagination = function () {
-        if ($paginationContainerElement) {
+        if (autoPagination) {
             var pageCount = pagination.total / pagination.per_page
             if ((pagination.total % pagination.per_page) > 0) {
                 pageCount++;
@@ -115,75 +241,8 @@ var Gridview = function (options) {
             }
             paginationHtml += '</ul>';
 
-            $paginationContainerElement.html(paginationHtml)
-        }
-    };
-    var createGridviewTable = function () {
-        if ($containerElement) {
-            $containerElement.html('');
-            var $tableBody = $('<tbody>');
-            var $table = $('<table class="table table-striped">');
+            return paginationHtml;
 
-            // create table head
-            var tr = '';
-            if (autoIncrementColumn) {
-                tr += '<th>' + autoIncrementColumnName + '</th>';
-            }
-
-            for (var i in columns) {
-                var column = columns[i];
-
-                var th = '';
-                switch (column.type) {
-                    case 'hidden':
-                        th = '<th class="gridview-column-header-' + column.name + '" style="display: none">' + column.caption + '</th>';
-                        break;
-                    case 'string':
-                    case 'number':
-                        th = '<th class="gridview-column-header-' + column.name + '">' + column.caption + '</th>';
-                        break;
-                }
-                tr += th
-            }
-            $table.append('<thead><tr>' + tr + '</tr></thead>');
-
-            // create table body
-            var row_number = (pagination.current_page - 1) * pagination.per_page;
-            for (var index in resultRows) {
-                var row = resultRows[index];
-                var tr = '<tr>';
-
-                if (autoIncrementColumn) {
-                    row_number = row_number + 1
-                    tr += '<td>' + row_number + '</td>';
-                }
-
-                for (var i in columns) {
-                    var column = columns[i];
-                    var td = '';
-                    if (column.render) {
-                        td = '<td class="gridview-column-' + column.name + '">' + column.render(row[column.name], row) + '</td>';
-                    } else {
-                        switch (column.type) {
-                            case 'hidden':
-                                td = '<td class="gridview-column-' + column.name + '" style="display: none">' + row[column.name] + '</td>';
-                                break;
-                            case 'string':
-                            case 'number':
-                                td = '<td class="gridview-column-' + column.name + '">' + row[column.name] + '</td>';
-                                break;
-                        }
-                    }
-                    tr += td;
-                }
-                tr += '</tr>';
-                $tableBody.append(tr);
-            }
-
-
-            $table.append($tableBody);
-
-            $containerElement.append($table);
         }
     };
 
@@ -204,7 +263,6 @@ var Gridview = function (options) {
             }
         }
 
-
         params['req'] = JSON.stringify({
             filters: filters,
             sorts: sorts,
@@ -214,11 +272,7 @@ var Gridview = function (options) {
         $.post(dataSourceUrl, params, function (result) {
             resultRows = result.data;
             pagination = result.pagination;
-            for (var i = 0; i < resultRows.length; i++) {
-                resultRows[i].row_number = pagination.from + i
-            }
-            createGridviewTable();
-            createPagination();
+            createGridView();
             onload(resultRows);
         });
     };

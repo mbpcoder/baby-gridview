@@ -17,7 +17,7 @@
             display: inline-block;
         }
 
-        input{
+        input {
             width: 169px;
         }
 
@@ -118,7 +118,8 @@
     var gridview = new Gridview({
         dataSourceUrl: '/data.php',
         gridviewContainerId: 'UsersGridView',
-        paginationContainerId: 'UsersPagination',
+        autoGridTemplate: true,
+        autoPagination: true,
         autoIncrementColumn: true,
         autoIncrementColumnName: '#',
         onload: function (users) {
@@ -185,7 +186,8 @@
                 ignoreValue: '', // don't filter on this
             },
             operator: 'equal' // filter operator
-        }
+        },
+        sort: true
     });
     gridview.addColumn({
         name: 'action',
