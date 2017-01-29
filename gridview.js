@@ -9,6 +9,7 @@ var Gridview = function (options) {
     var autoPagination = options.autoPagination || true;
 
     if ($containerElement) {
+
         $containerElement.on('click', 'ul.pagination li a', function (e) {
             var $this = $(this);
             $containerElement.find('ul.pagination li').removeClass('active');
@@ -19,27 +20,30 @@ var Gridview = function (options) {
             send();
         });
 
-        $containerElement.on('click', '.js-sort', function (e) {
-            var $this = $(this);
-            $this.removeClass('js-sort').addClass('js-sort-ascending');
-            $this.removeClass('mdi-sort').addClass('mdi-sort-ascending');
-
-            addAscendingSort(name);
-            //send();
-        });
-
         $containerElement.on('click', '.js-sort-ascending', function (e) {
             var $this = $(this);
-            console.log(this)
-            $this.removeClass('js-sort-ascending').addClass('js-sort-descending');
-            $this.removeClass('mdi-sort-ascending').addClass('mdi-sort-descending');
+            var name = $this.closest('th').data('name');
+            if (sorts[name] == 'ACS') {
+                delete sorts[name];
+                $this.css('color', 'inherited');
+            } else {
+                addAscendingSort(name);
+                $this.css('color', 'red');
+            }
+            send();
         });
 
         $containerElement.on('click', '.js-sort-descending', function (e) {
             var $this = $(this);
-            console.log(this)
-            $this.removeClass('js-sort-descending').addClass('js-sort');
-            $this.removeClass('mdi-sort-descending').addClass('mdi-sort');
+            var name = $this.closest('th').data('name');
+            if (sorts[name] == 'DESC') {
+                delete sorts[name];
+                $this.css('color', 'inherited');
+            } else {
+                addDescendingSort(name);
+                $this.css('color', 'red');
+            }
+            send();
         });
     }
 
@@ -63,7 +67,7 @@ var Gridview = function (options) {
         to: 14,
     };
     var filters = [];
-    var sorts = [];
+    var sorts = {};
 
     // private functions
 
@@ -81,10 +85,7 @@ var Gridview = function (options) {
 
     // sorting
     var addSort = function (name, type) {
-        sorts.push({
-            name: name,
-            type: type,
-        });
+        sorts[name] = type;
     };
     var addAscendingSort = function (name) {
         addSort(name, 'ACS');
@@ -142,8 +143,9 @@ var Gridview = function (options) {
         var html = '<div class="gridview-header"></div>';
         return '';
     };
-
     var createGridViewTableHeader = function () {
+
+        // string way
         // create table head
         var html = '';
         if (autoIncrementColumn) {
@@ -160,22 +162,61 @@ var Gridview = function (options) {
                     break;
                 case 'string':
                 case 'number':
-                    th = '<th class="gridview-column-header-' + column.name + '">' + column.caption;
+                    th = '<th data-name="' + column.name + '" class="gridview-column-header-' + column.name + '">' + column.caption;
                     break;
             }
 
             if (column.sort) {
-                th += '<i class="mdi mdi-sort pull-left js-sort"></i></th>'
+                if (sorts[column.name] == 'ACS') {
+                    th += '<i title="صعودی" style="cursor: pointer;color: red;" class="mdi mdi-sort-ascending pull-left js-sort-ascending"></i><i title="نزولی" style="cursor: pointer" class="mdi mdi-sort-descending pull-left js-sort-descending"></i></th>'
+                }
+                else if (sorts[column.name] == 'DESC') {
+                    th += '<i title="صعودی" style="cursor: pointer" class="mdi mdi-sort-ascending pull-left js-sort-ascending"></i><i title="نزولی" style="cursor: pointer;color: red;" class="mdi mdi-sort-descending pull-left js-sort-descending"></i></th>'
+                } else {
+                    th += '<i title="صعودی" style="cursor: pointer" class="mdi mdi-sort-ascending pull-left js-sort-ascending"></i><i title="نزولی" style="cursor: pointer" class="mdi mdi-sort-descending pull-left js-sort-descending"></i></th>'
+                }
             } else {
                 th += '</th>'
             }
-
 
             html += th
         }
 
         html = '<thead><tr>' + html + '</tr></thead>';
         return html;
+
+        // Object Way
+        var $thead = $('<head>');
+        var $tr = $('<tr>');
+        if (autoIncrementColumn) {
+            $tr.append('<th>' + autoIncrementColumnName + '</th>')
+        }
+
+        for (var i in columns) {
+            var column = columns[i];
+
+            var $th = $('<th class="gridview-column-header-' + column.name + '">' + column.caption + '</th>');
+            switch (column.type) {
+                case 'hidden':
+                    $th.css('display', 'none');
+                    break;
+                case 'string':
+                case 'number':
+                    break;
+            }
+
+            if (column.sort) {
+                var $ascending = $('<i class="mdi mdi-sort-ascending pull-left js-sort-ascending"></i>')
+                var $descending = $('<i class="mdi mdi-sort-descending pull-left js-sort-descending"></i>')
+                $th.append($ascending);
+                $th.append($descending);
+            }
+
+
+            $tr.append($th);
+        }
+        $thead.append($th)
+        return $thead;
     };
     var createGridviewTable = function () {
         if (autoGridTemplate) {
@@ -254,6 +295,10 @@ var Gridview = function (options) {
 
         for (var index in columns) {
             var column = columns[index];
+
+            if (column.sort) {
+
+            }
 
             if (column.filter != undefined) {
                 var oprand1Value = getValue(column.filter.oprand1.elementId);

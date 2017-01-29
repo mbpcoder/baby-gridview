@@ -11,10 +11,12 @@ $pagination = $req->pagination;
 $db = new PDO('sqlite:database.sqlite');
 $query = 'SELECT * FROM users';
 $query = processFilters($query, $filters);
-$query = processSorts($query, $sorts);
 
 $queryCount = str_replace('*', 'count(*)', $query);
 $result = $db->query($queryCount);
+
+$query = processSorts($query, $sorts);
+
 $pagination->total = (integer)$result->fetchColumn();
 
 $query = $query . ' limit ' . $pagination->per_page;
@@ -25,8 +27,6 @@ $result = $db->query($query, PDO::FETCH_ASSOC);
 //var_dump($result);
 
 $users = $result->fetchAll();
-
-
 
 
 header('Content-Type: application/json');
@@ -62,13 +62,15 @@ function processFilters($query, $filters)
 
 function processSorts($query, $sorts)
 {
-    if (count($sorts) > 0) {
-        $sql = ' order by ';
-        foreach ($sorts as $sort) {
-            $query .= ' order by ' . $sort->name . ' ' . $sort->type;
+//    var_dump($sorts);
+//    die;
+//    if ($sorts) {
+//        $sql = ' order by ';
+        foreach ($sorts as $name => $type) {
+            $query .= ' order by ' . $name . ' ' . $type;
         }
-        $query .= $sql;
-    }
+        //$query .= $sql;
+
 
     return $query;
 }
