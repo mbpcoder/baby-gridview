@@ -52,6 +52,17 @@ function processFilters($query, $filters)
                 case 'contain':
                     $query .= $filter->name . ' LIKE' . " '%" . $filter->oprand1 . "%'";
                     break;
+                case 'in':
+                    $str = '(';
+                    for ($j = 0; $j < count($filter->oprand1); $j++) {
+                        $str .= "'{$filters->oprand1[$j]}'";
+                        if ($j != count($filter->oprand1) - 1) {
+                            $str .= ' , ';
+                        }
+                    }
+                    $str .= ')';
+                    $query .= $filter->name . ' IN ' . $str;
+                    break;
                 case 'smaller':
                     $query .= $filter->name . ' <= ' . "$filter->oprand1";
                     break;

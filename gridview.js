@@ -123,6 +123,9 @@ var Gridview = function (options) {
     var addFilterContain = function (name, type, oprand1) {
         addFilter(name, type, 'contain', oprand1, undefined)
     };
+    var addFilterIn = function (name, type, oprand1) {
+        addFilter(name, type, 'in', oprand1, undefined)
+    };
     var addFilterSmaller = function (name, type, oprand1) {
         addFilter(name, type, 'smaller', oprand1, undefined)
     };
@@ -371,6 +374,7 @@ var Gridview = function (options) {
     this.addDescendingSort = addDescendingSort;
     this.addFilterEqual = addFilterEqual;
     this.addFilterContain = addFilterContain;
+    this.addFilterIn = addFilterIn;
     this.addFilterSmaller = addFilterSmaller;
     this.addFilterGreater = addFilterGreater;
     this.addFilterBetween = addFilterBetween;
