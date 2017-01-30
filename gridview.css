@@ -40,28 +40,28 @@ table td, table th {
     vertical-align: top
 }
 
-#UsersPagination {
+#UsersGridView ul {
     display: inline-block;
     padding: 0;
     margin: 0;
 }
 
-#UsersPagination li.active a {
+#UsersGridView li.active a {
     background-color: #ddd;;
 }
 
-#UsersPagination li {
+#UsersGridView li {
     display: inline;
 }
 
-#UsersPagination li a {
+#UsersGridView li a {
     text-decoration: none;
     color: #000;
     float: left;
     padding: 8px 16px;
 }
 
-#UsersPagination a:hover {
+#UsersGridView a:hover {
     transition: background-color .25s, color .15s, box-shadow .15s, opacity .25s, filter .25s, border .15s;
 }
 
