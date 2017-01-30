@@ -23,7 +23,7 @@ var Gridview = function (options) {
         $containerElement.on('click', '.js-sort-ascending', function (e) {
             var $this = $(this);
             var name = $this.closest('th').data('name');
-            if (sorts[name] == 'ACS') {
+            if (sorts[name] == 'ASC') {
                 delete sorts[name];
                 $this.css('color', 'inherited');
             } else {
@@ -74,9 +74,22 @@ var Gridview = function (options) {
     var addColumn = function (column) {
         columns.push(column);
     };
+    var removeColumn = function (name) {
+        for (var index = 0; index < columns.length; index++) {
+            var column = columns[index];
+            if (name == column.name) {
+                columns.splice(index, 1);
+                return true
+            }
+        }
+        return false;
+    };
+
     var getValue = function (elementId) {
-        var value = $('#' + elementId).val();
-        if (value) {
+        var $element = $('#' + elementId)
+
+        var value = $element.val();
+        if (value && value.constructor !== Array) {
             value = value.trim(value);
         }
         return value;
@@ -88,7 +101,7 @@ var Gridview = function (options) {
         sorts[name] = type;
     };
     var addAscendingSort = function (name) {
-        addSort(name, 'ACS');
+        addSort(name, 'ASC');
     };
     var addDescendingSort = function (name) {
         addSort(name, 'DESC');
@@ -110,12 +123,21 @@ var Gridview = function (options) {
     var addFilterContain = function (name, type, oprand1) {
         addFilter(name, type, 'contain', oprand1, undefined)
     };
+    var addFilterSmaller = function (name, type, oprand1) {
+        addFilter(name, type, 'smaller', oprand1, undefined)
+    };
+    var addFilterGreater = function (name, type, oprand1) {
+        addFilter(name, type, 'greater', oprand1, undefined)
+    };
+    var addFilterBetween = function (name, type, oprand1, oprand2) {
+        addFilter(name, type, 'between', oprand1, oprand2)
+    };
     var removeFilter = function (name) {
         var result = false;
-        for (var index = 0; index > filters.length; index++) {
+        for (var index = 0; index < filters.length; index++) {
             var filter = filters[index];
             if (name == filter.name) {
-                filters.splice(index);
+                filters.splice(index, 1);
                 result = true;
             }
         }
@@ -167,7 +189,7 @@ var Gridview = function (options) {
             }
 
             if (column.sort) {
-                if (sorts[column.name] == 'ACS') {
+                if (sorts[column.name] == 'ASC') {
                     th += '<i title="صعودی" style="cursor: pointer;color: red;" class="mdi mdi-sort-ascending pull-left js-sort-ascending"></i><i title="نزولی" style="cursor: pointer" class="mdi mdi-sort-descending pull-left js-sort-descending"></i></th>'
                 }
                 else if (sorts[column.name] == 'DESC') {
@@ -301,9 +323,24 @@ var Gridview = function (options) {
             }
 
             if (column.filter != undefined) {
-                var oprand1Value = getValue(column.filter.oprand1.elementId);
-                if (oprand1Value && oprand1Value != column.filter.oprand1.ignoreValue) {
-                    addFilter(column.name, column.type, column.filter.operator, oprand1Value, undefined)
+
+                if (column.filter.operator == 'between') {
+                    var oprand1Value = getValue(column.filter.oprand1.elementId);
+                    var oprand2Value = getValue(column.filter.oprand2.elementId);
+
+                    if (oprand1Value && !oprand2Value && oprand1Value != column.filter.oprand1.ignoreValue) {
+                        addFilterSmaller(column.name, column.type, oprand1Value)
+                    }
+                    else if (!oprand1Value && oprand2Value && oprand2Value != column.filter.oprand2.ignoreValue) {
+                        addFilterGreater(column.name, column.type, oprand2Value)
+                    } else if ((oprand1Value && oprand1Value != column.filter.oprand1.ignoreValue) && (oprand2Value && oprand2Value != column.filter.oprand2.ignoreValue)) {
+                        addFilterBetween(column.name, column.type, oprand1Value, oprand2Value)
+                    }
+                } else {
+                    var oprand1Value = getValue(column.filter.oprand1.elementId);
+                    if (oprand1Value && oprand1Value != column.filter.oprand1.ignoreValue) {
+                        addFilter(column.name, column.type, column.filter.operator, oprand1Value, undefined)
+                    }
                 }
             }
         }
@@ -316,8 +353,12 @@ var Gridview = function (options) {
 
         $.post(dataSourceUrl, params, function (result) {
             resultRows = result.data;
-            pagination = result.pagination;
-            createGridView();
+            if (resultRows && resultRows.length > 0) {
+                pagination = result.pagination;
+                createGridView();
+            } else {
+                $containerElement.html('<p style="text-align: center">empty data</p>');
+            }
             onload(resultRows);
         });
     };
@@ -325,10 +366,14 @@ var Gridview = function (options) {
 
     // public function
     this.addColumn = addColumn;
+    this.removeColumn = removeColumn;
     this.addAscendingSort = addAscendingSort;
     this.addDescendingSort = addDescendingSort;
     this.addFilterEqual = addFilterEqual;
     this.addFilterContain = addFilterContain;
+    this.addFilterSmaller = addFilterSmaller;
+    this.addFilterGreater = addFilterGreater;
+    this.addFilterBetween = addFilterBetween;
     this.removeFilter = removeFilter;
     this.removeAllFilters = removeAllFilters;
     this.send = send;

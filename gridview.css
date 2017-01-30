@@ -1,3 +1,70 @@
+.form-group {
+    width: 260px;
+    display: inline-block;
+    padding: 5px;
+    margin-bottom: 5px;
+    margin-top: 5px;
+}
+
+.form-group label {
+    width: 75px;
+    display: inline-block;
+}
+
+input {
+    width: 169px;
+}
+
+select {
+    width: 169px;
+    border-width: 1px;
+    padding: 2px;
+}
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    width: 100%;
+    display: table;
+    border: 1px solid #ccc !important;
+}
+
+tbody tr:nth-child(odd) {
+    background-color: #f1f1f1
+}
+
+table td, table th {
+    padding: 8px 8px;
+    display: table-cell;
+    text-align: left;
+    vertical-align: top
+}
+
+#UsersPagination {
+    display: inline-block;
+    padding: 0;
+    margin: 0;
+}
+
+#UsersPagination li.active a {
+    background-color: #ddd;;
+}
+
+#UsersPagination li {
+    display: inline;
+}
+
+#UsersPagination li a {
+    text-decoration: none;
+    color: #000;
+    float: left;
+    padding: 8px 16px;
+}
+
+#UsersPagination a:hover {
+    transition: background-color .25s, color .15s, box-shadow .15s, opacity .25s, filter .25s, border .15s;
+}
+
 .anonymous-gridview {
 
 }
@@ -7,9 +74,32 @@
 }
 
 .mdi.mdi-sort-ascending {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    color: black;
+    border: 1px solid #f2f2f2;
+    padding: 1px;
+    margin: 1px;
+    vertical-align: middle;
+}
 
+.mdi.mdi-sort-ascending:after {
+    content: '^';
 }
 
 .mdi.mdi-sort-descending {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    color: black;
+    border: 1px solid #f2f2f2;
+    padding: 1px;
+    margin: 1px;
+    transform: rotate(180deg);
+    vertical-align: middle;
+}
 
+.mdi.mdi-sort-descending:after {
+    content:'^';
 }

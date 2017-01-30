@@ -3,76 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Document</title>
-    <style>
-        .form-group {
-            width: 260px;
-            display: inline-block;
-            padding: 5px;
-            margin-bottom: 5px;
-            margin-top: 5px;
-        }
-
-        .form-group label {
-            width: 75px;
-            display: inline-block;
-        }
-
-        input {
-            width: 169px;
-        }
-
-        select {
-            width: 169px;
-            border-width: 1px;
-            padding: 2px;
-        }
-
-        table {
-            border-collapse: collapse;
-            border-spacing: 0;
-            width: 100%;
-            display: table;
-            border: 1px solid #ccc !important;
-        }
-
-        tbody tr:nth-child(odd) {
-            background-color: #f1f1f1
-        }
-
-        table td, table th {
-            padding: 8px 8px;
-            display: table-cell;
-            text-align: left;
-            vertical-align: top
-        }
-
-        #UsersPagination {
-            display: inline-block;
-            padding: 0;
-            margin: 0;
-        }
-
-        #UsersPagination li.active a {
-            background-color: #ddd;;
-        }
-
-        #UsersPagination li {
-            display: inline;
-        }
-
-        #UsersPagination li a {
-            text-decoration: none;
-            color: #000;
-            float: left;
-            padding: 8px 16px;
-        }
-
-        #UsersPagination a:hover {
-            transition: background-color .25s, color .15s, box-shadow .15s, opacity .25s, filter .25s, border .15s;
-        }
-
-        /*w3-table w3-striped w3-border*/
-    </style>
     <link rel="stylesheet" href="gridview.css">
     <script src="jquery.min.js"></script>
     <script src="gridview.js"></script>
@@ -103,8 +33,17 @@
 </div>
 
 <div class="form-group">
+    <label for="age">Filter Type</label>
+    <select id="ageFilterSelect">
+        <option value="equal">equal</option>
+        <option value="smaller">smaller</option>
+        <option value="greater">greater</option>
+        <option value="between">between</option>
+    </select>
     <label for="age">Age</label>
-    <input type="number" name="age" id="age">
+    <input type="number" id="age">
+    <input style="display: none;width: 80px" type="number" id="ageSmaller">
+    <input style="display: none;width: 80px" type="number" id="ageGreater">
 </div>
 
 <div class="form-group">
@@ -112,7 +51,6 @@
 </div>
 
 <div id="UsersGridView"></div>
-<div id="UsersPagination"></div>
 
 <script>
 
@@ -175,20 +113,13 @@
                 ignoreValue: 'all', // don't filter on this
             },
             operator: 'equal' // filter operator
-        }
+        },
+        sort: true
     });
     gridview.addColumn({
         name: 'age',
         caption: 'Age',
-        type: 'number',
-        filter: {
-            oprand1: {
-                elementId: 'age', // element id
-                ignoreValue: '', // don't filter on this
-            },
-            operator: 'equal' // filter operator
-        },
-        sort: true
+        type: 'number'
     });
     gridview.addColumn({
         name: 'action',
@@ -206,6 +137,75 @@
     $('#ButtonSearch').click(function (e) {
         gridview.send();
     });
+
+    $('#ageFilterSelect').change(function (e) {
+
+        gridview.removeColumn('age');
+
+        $('#age').show();
+        $('#ageSmaller').hide();
+        $('#ageGreater').hide();
+
+        var column = {
+            name: 'age',
+            caption: 'Age',
+            type: 'number',
+        };
+        var $this = $(this);
+        var value = $this.val();
+        var age = $('#age').val();
+
+        switch (value) {
+            case 'equal':
+                gridview.addFilterEqual('age', 'number', age);
+                column.filter = {
+                    oprand1: {
+                        elementId: 'age', // element id
+                        ignoreValue: '', // don't filter on this
+                    },
+                    operator: 'equal' // filter operator
+                };
+                break;
+            case 'smaller':
+                gridview.addFilterSmaller('age', 'number', age);
+                column.filter = {
+                    oprand1: {
+                        elementId: 'age', // element id
+                        ignoreValue: '', // don't filter on this
+                    },
+                    operator: 'smaller' // filter operator
+                };
+                break;
+            case 'greater':
+                gridview.addFilterGreater('age', 'number', age);
+                column.filter = {
+                    oprand1: {
+                        elementId: 'age', // element id
+                        ignoreValue: '', // don't filter on this
+                    },
+                    operator: 'greater' // filter operator
+                };
+                break;
+            case 'between':
+                $('#age').hide();
+                $('#ageSmaller').show();
+                $('#ageGreater').show();
+                column.filter = {
+                    oprand1: {
+                        elementId: 'ageSmaller', // element id
+                        ignoreValue: '', // don't filter on this
+                    },
+                    oprand2: {
+                        elementId: 'ageGreater', // element id
+                        ignoreValue: '', // don't filter on this
+                    },
+                    operator: 'between' // filter operator
+                };
+                break;
+        }
+        gridview.addColumn(column);
+    });
+    $('#ageFilterSelect').trigger('change');
 
 </script>
 </body>

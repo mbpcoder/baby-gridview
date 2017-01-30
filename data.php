@@ -19,8 +19,8 @@ $query = processSorts($query, $sorts);
 
 $pagination->total = (integer)$result->fetchColumn();
 
-$query = $query . ' limit ' . $pagination->per_page;
-$query = $query . ' offset ' . $pagination->from;
+$query = $query . ' LIMIT ' . $pagination->per_page;
+$query = $query . ' OFFSET ' . $pagination->from;
 
 //var_dump($query);
 $result = $db->query($query, PDO::FETCH_ASSOC);
@@ -52,6 +52,15 @@ function processFilters($query, $filters)
                 case 'contain':
                     $query .= $filter->name . ' LIKE' . " '%" . $filter->oprand1 . "%'";
                     break;
+                case 'smaller':
+                    $query .= $filter->name . ' <= ' . "$filter->oprand1";
+                    break;
+                case 'greater':
+                    $query .= $filter->name . ' >= ' . $filter->oprand1;
+                    break;
+                case 'between':
+                    $query .= $filter->name . ' BETWEEN ' . $filter->oprand1 . ' AND ' . $filter->oprand2;
+                    break;
             }
         }
 
@@ -66,10 +75,10 @@ function processSorts($query, $sorts)
 //    die;
 //    if ($sorts) {
 //        $sql = ' order by ';
-        foreach ($sorts as $name => $type) {
-            $query .= ' order by ' . $name . ' ' . $type;
-        }
-        //$query .= $sql;
+    foreach ($sorts as $name => $type) {
+        $query .= ' ORDER BY ' . $name . ' ' . $type;
+    }
+    //$query .= $sql;
 
 
     return $query;
