@@ -360,8 +360,8 @@ var Gridview = function (options) {
 
         $.post(dataSourceUrl, params, function (result) {
             resultRows = result.data;
-            createGridView();
             pagination = result.pagination;
+            createGridView();
             onload(resultRows);
         });
     };
