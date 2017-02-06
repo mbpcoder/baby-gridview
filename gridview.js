@@ -250,13 +250,17 @@ var Gridview = function (options) {
 
             // create table body
             tableHtml += '<tbody>';
-            var autoIncrementNumber = (pagination.current_page - 1) * pagination.per_page;
-            for (var index in resultRows) {
-                var row = resultRows[index];
-                autoIncrementNumber = autoIncrementNumber + 1;
-                row.autoIncrementNumber = autoIncrementNumber;
+            if (resultRows.length <= 0) {
+                tableHtml += '<tr><td colspan="' + columns.length + '">empty data</td></tr>';
+            } else {
+                var autoIncrementNumber = (pagination.current_page - 1) * pagination.per_page;
+                for (var index in resultRows) {
+                    var row = resultRows[index];
+                    autoIncrementNumber = autoIncrementNumber + 1;
+                    row.autoIncrementNumber = autoIncrementNumber;
 
-                tableHtml += createGridViewTableRow(row);
+                    tableHtml += createGridViewTableRow(row);
+                }
             }
             tableHtml += '</tbody>';
             tableHtml += '</table>';
@@ -356,12 +360,8 @@ var Gridview = function (options) {
 
         $.post(dataSourceUrl, params, function (result) {
             resultRows = result.data;
-            if (resultRows && resultRows.length > 0) {
-                pagination = result.pagination;
-                createGridView();
-            } else {
-                $containerElement.html('<p style="text-align: center">empty data</p>');
-            }
+            createGridView();
+            pagination = result.pagination;
             onload(resultRows);
         });
     };
