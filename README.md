@@ -13,7 +13,7 @@ there is a sqlite database that contain demo data.
 
 * data table creation
 * columns filtering
-* equal, contain filtering capability
+* equal, contain, smaller than, greater than, between filtering capability
 * simple pagination
 * auto increment column
 * number, string data type
