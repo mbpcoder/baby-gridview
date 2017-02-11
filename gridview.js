@@ -24,7 +24,7 @@ var Gridview = function (options) {
             var $this = $(this);
             var name = $this.closest('th').data('name');
             if (sorts[name] == 'ASC') {
-                delete sorts[name];
+                removeSort(name);
                 $this.css('color', 'inherited');
             } else {
                 addAscendingSort(name);
@@ -37,7 +37,7 @@ var Gridview = function (options) {
             var $this = $(this);
             var name = $this.closest('th').data('name');
             if (sorts[name] == 'DESC') {
-                delete sorts[name];
+                removeSort(name);
                 $this.css('color', 'inherited');
             } else {
                 addDescendingSort(name);
@@ -100,6 +100,9 @@ var Gridview = function (options) {
     };
     var addDescendingSort = function (name) {
         addSort(name, 'DESC');
+    };
+    var removeSort = function (name) {
+        delete sorts[name];
     };
 
     // filtering
@@ -320,14 +323,14 @@ var Gridview = function (options) {
                         addFilterGreater(column.name, column.type, oprand2Value)
                     } else if ((oprand1Value && oprand1Value != column.filter.oprand1.ignoreValue) && (oprand2Value && oprand2Value != column.filter.oprand2.ignoreValue)) {
                         addFilterBetween(column.name, column.type, oprand1Value, oprand2Value)
-                    }else{
+                    } else {
                         removeFilter(column.name);
                     }
                 } else {
                     var oprand1Value = getValue(column.filter.oprand1.elementId);
                     if (oprand1Value && oprand1Value != column.filter.oprand1.ignoreValue) {
                         addFilter(column.name, column.type, column.filter.operator, oprand1Value, undefined)
-                    }else{
+                    } else {
                         removeFilter(column.name)
                     }
                 }
@@ -354,6 +357,7 @@ var Gridview = function (options) {
     this.removeColumn = removeColumn;
     this.addAscendingSort = addAscendingSort;
     this.addDescendingSort = addDescendingSort;
+    this.removeSort = removeSort;
     this.addFilterEqual = addFilterEqual;
     this.addFilterContain = addFilterContain;
     this.addFilterIn = addFilterIn;
