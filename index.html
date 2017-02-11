@@ -135,75 +135,41 @@
     gridview.send();
 
     $('#ButtonSearch').click(function (e) {
+        var age = $('#age').val();
+        if (age != '') {
+            var value = $('#ageFilterSelect').val();
+            switch (value) {
+                case 'equal':
+                    gridview.addFilterEqual('age', 'number', age);
+                    break;
+                case 'smaller':
+                    gridview.addFilterSmaller('age', 'number', age);
+                    break;
+                case 'greater':
+                    gridview.addFilterGreater('age', 'number', age);
+                    break;
+                case 'between':
+                    gridview.addFilterBetween('age', 'number', age);
+                    break;
+            }
+        }
         gridview.send();
     });
 
     $('#ageFilterSelect').change(function (e) {
 
-        gridview.removeColumn('age');
-
         $('#age').show();
         $('#ageSmaller').hide();
         $('#ageGreater').hide();
 
-        var column = {
-            name: 'age',
-            caption: 'Age',
-            type: 'number',
-        };
         var $this = $(this);
         var value = $this.val();
-        var age = $('#age').val();
 
-        switch (value) {
-            case 'equal':
-                gridview.addFilterEqual('age', 'number', age);
-                column.filter = {
-                    oprand1: {
-                        elementId: 'age', // element id
-                        ignoreValue: '', // don't filter on this
-                    },
-                    operator: 'equal' // filter operator
-                };
-                break;
-            case 'smaller':
-                gridview.addFilterSmaller('age', 'number', age);
-                column.filter = {
-                    oprand1: {
-                        elementId: 'age', // element id
-                        ignoreValue: '', // don't filter on this
-                    },
-                    operator: 'smaller' // filter operator
-                };
-                break;
-            case 'greater':
-                gridview.addFilterGreater('age', 'number', age);
-                column.filter = {
-                    oprand1: {
-                        elementId: 'age', // element id
-                        ignoreValue: '', // don't filter on this
-                    },
-                    operator: 'greater' // filter operator
-                };
-                break;
-            case 'between':
-                $('#age').hide();
-                $('#ageSmaller').show();
-                $('#ageGreater').show();
-                column.filter = {
-                    oprand1: {
-                        elementId: 'ageSmaller', // element id
-                        ignoreValue: '', // don't filter on this
-                    },
-                    oprand2: {
-                        elementId: 'ageGreater', // element id
-                        ignoreValue: '', // don't filter on this
-                    },
-                    operator: 'between' // filter operator
-                };
-                break;
+        if (value == 'between') {
+            $('#age').hide();
+            $('#ageSmaller').show();
+            $('#ageGreater').show();
         }
-        gridview.addColumn(column);
     });
    $('#ageFilterSelect').trigger('change');
 
