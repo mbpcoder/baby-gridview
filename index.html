@@ -152,6 +152,8 @@
                     gridview.addFilterBetween('age', 'number', age);
                     break;
             }
+        } else {
+            gridview.removeFilter('age');
         }
         gridview.send();
     });
@@ -171,7 +173,7 @@
             $('#ageGreater').show();
         }
     });
-   $('#ageFilterSelect').trigger('change');
+    $('#ageFilterSelect').trigger('change');
 
 </script>
 </body>
