@@ -57,7 +57,7 @@ var Gridview = function (options) {
     var gridviewClassName = 'anonymous-gridview';
 
     // variables
-    var columns = [];
+    var columns = {};
     var resultRows = [];
     var pagination = {
         total: undefined,
@@ -66,23 +66,18 @@ var Gridview = function (options) {
         from: 0,
         to: 14,
     };
-    var filters = [];
+    var filters = {};
     var sorts = {};
 
     // private functions
 
     var addColumn = function (column) {
-        columns.push(column);
+        columns[column.name] = column;
+        //columns.push(column);
+        //addFilter()
     };
     var removeColumn = function (name) {
-        for (var index = 0; index < columns.length; index++) {
-            var column = columns[index];
-            if (name == column.name) {
-                columns.splice(index, 1);
-                return true
-            }
-        }
-        return false;
+        delete columns[name];
     };
 
     var getValue = function (elementId) {
@@ -109,13 +104,13 @@ var Gridview = function (options) {
 
     // filtering
     var addFilter = function (name, type, operator, oprand1, oprand2) {
-        filters.push({
+        filters[name] = {
             name: name,
             type: type,
             operator: operator,
             oprand1: oprand1,
             oprand2: oprand2,
-        });
+        };
     };
     var addFilterEqual = function (name, type, oprand1) {
         addFilter(name, type, 'equal', oprand1, undefined)
@@ -136,18 +131,10 @@ var Gridview = function (options) {
         addFilter(name, type, 'between', oprand1, oprand2)
     };
     var removeFilter = function (name) {
-        var result = false;
-        for (var index = 0; index < filters.length; index++) {
-            var filter = filters[index];
-            if (name == filter.name) {
-                filters.splice(index, 1);
-                result = true;
-            }
-        }
-        return result;
+        delete filters[name];
     };
     var removeAllFilters = function () {
-        filters = [];
+        filters = {};
         return true;
     };
 
@@ -319,18 +306,9 @@ var Gridview = function (options) {
     // request
     var send = function () {
         var params = extraData;
-
-        filters = [];
-
         for (var index in columns) {
             var column = columns[index];
-
-            if (column.sort) {
-
-            }
-
             if (column.filter != undefined) {
-
                 if (column.filter.operator == 'between') {
                     var oprand1Value = getValue(column.filter.oprand1.elementId);
                     var oprand2Value = getValue(column.filter.oprand2.elementId);
@@ -342,11 +320,15 @@ var Gridview = function (options) {
                         addFilterGreater(column.name, column.type, oprand2Value)
                     } else if ((oprand1Value && oprand1Value != column.filter.oprand1.ignoreValue) && (oprand2Value && oprand2Value != column.filter.oprand2.ignoreValue)) {
                         addFilterBetween(column.name, column.type, oprand1Value, oprand2Value)
+                    }else{
+                        removeFilter(column.name);
                     }
                 } else {
                     var oprand1Value = getValue(column.filter.oprand1.elementId);
                     if (oprand1Value && oprand1Value != column.filter.oprand1.ignoreValue) {
                         addFilter(column.name, column.type, column.filter.operator, oprand1Value, undefined)
+                    }else{
+                        removeFilter(column.name)
                     }
                 }
             }

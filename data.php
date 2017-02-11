@@ -38,59 +38,53 @@ echo json_encode([
 
 function processFilters($query, $filters)
 {
-    if (count($filters) > 0) {
-        $query .= ' WHERE ';
-        for ($i = 0; $i < count($filters); $i++) {
-            $filter = $filters[$i];
-            if ($i != 0) {
-                $query .= ' AND ';
-            }
-            switch ($filter->operator) {
-                case 'equal':
-                    $query .= $filter->name . '=' . "'" . $filter->oprand1 . "'";
-                    break;
-                case 'contain':
-                    $query .= $filter->name . ' LIKE' . " '%" . $filter->oprand1 . "%'";
-                    break;
-                case 'in':
-                    $str = '(';
-                    for ($j = 0; $j < count($filter->oprand1); $j++) {
-                        $str .= "'{$filters->oprand1[$j]}'";
-                        if ($j != count($filter->oprand1) - 1) {
-                            $str .= ' , ';
-                        }
-                    }
-                    $str .= ')';
-                    $query .= $filter->name . ' IN ' . $str;
-                    break;
-                case 'smaller':
-                    $query .= $filter->name . ' <= ' . "$filter->oprand1";
-                    break;
-                case 'greater':
-                    $query .= $filter->name . ' >= ' . $filter->oprand1;
-                    break;
-                case 'between':
-                    $query .= $filter->name . ' BETWEEN ' . $filter->oprand1 . ' AND ' . $filter->oprand2;
-                    break;
-            }
+    $i = 0;
+    foreach ($filters as $key => $filter) {
+        //var_dump($filter);
+        if ($i == 0) {
+            $query .= ' WHERE ';
+            $i++;
+        } else {
+            $query .= ' AND ';
         }
-
+        switch ($filter->operator) {
+            case 'equal':
+                $query .= $filter->name . '=' . "'" . $filter->oprand1 . "'";
+                break;
+            case 'contain':
+                $query .= $filter->name . ' LIKE' . " '%" . $filter->oprand1 . "%'";
+                break;
+            case 'in':
+                $str = '(';
+                for ($j = 0; $j < count($filter->oprand1); $j++) {
+                    $str .= "'{$filters->oprand1[$j]}'";
+                    if ($j != count($filter->oprand1) - 1) {
+                        $str .= ' , ';
+                    }
+                }
+                $str .= ')';
+                $query .= $filter->name . ' IN ' . $str;
+                break;
+            case 'smaller':
+                $query .= $filter->name . ' <= ' . "$filter->oprand1";
+                break;
+            case 'greater':
+                $query .= $filter->name . ' >= ' . $filter->oprand1;
+                break;
+            case 'between':
+                $query .= $filter->name . ' BETWEEN ' . $filter->oprand1 . ' AND ' . $filter->oprand2;
+                break;
+        }
     }
-
     return $query;
+
 }
 
 function processSorts($query, $sorts)
 {
-//    var_dump($sorts);
-//    die;
-//    if ($sorts) {
-//        $sql = ' order by ';
     foreach ($sorts as $name => $type) {
         $query .= ' ORDER BY ' . $name . ' ' . $type;
     }
-    //$query .= $sql;
-
 
     return $query;
 }
