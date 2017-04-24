@@ -65,11 +65,11 @@ table td, table th {
     transition: background-color .25s, color .15s, box-shadow .15s, opacity .25s, filter .25s, border .15s;
 }
 
-.anonymous-gridview {
+.baby-gridview {
 
 }
 
-.anonymous-gridview table thead tr th {
+.baby-gridview table thead tr th {
     border: 1px solid #f2f2f2;
 }
 

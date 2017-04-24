@@ -7,6 +7,7 @@ var Gridview = function (options) {
 
     var autoGridTemplate = options.autoGridTemplate || true;
     var autoPagination = options.autoPagination || true;
+    var emptyDataTemplate = options.emptyDataTemplate || 'Empty Data';
 
     if ($containerElement) {
 
@@ -54,7 +55,7 @@ var Gridview = function (options) {
     var dataSourceUrl = options.dataSourceUrl;
     var extraData = options.extraData || {};
 
-    var gridviewClassName = 'anonymous-gridview';
+    var gridviewClassName = 'baby-gridview';
 
     // variables
     var columns = {};
@@ -240,8 +241,13 @@ var Gridview = function (options) {
 
             // create table body
             tableHtml += '<tbody>';
+            // empty result
             if (resultRows.length <= 0) {
-                tableHtml += '<tr><td colspan="' + columns.length + '">empty data</td></tr>';
+                var columnsLength = Object.keys(columns).length;
+                if (autoIncrementColumn) {
+                    columnsLength = columnsLength + 1;
+                }
+                tableHtml += '<tr><td colspan="' + columnsLength + '">' + emptyDataTemplate + '</td></tr>';
             } else {
                 var autoIncrementNumber = (pagination.current_page - 1) * pagination.per_page;
                 for (var index in resultRows) {

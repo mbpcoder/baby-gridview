@@ -23,6 +23,7 @@
     <label for="email">Email</label>
     <input type="text" name="email" id="email">
 </div>
+
 <div class="form-group">
     <label for="gender">Gender</label>
     <select name="gender" id="gender">
@@ -59,6 +60,7 @@
         gridviewContainerId: 'UsersGridView',
         autoGridTemplate: true,
         autoPagination: true,
+        emptyDataTemplate: '<p style="text-align: center">Empty Data</p>',
         autoIncrementColumn: true,
         autoIncrementColumnName: '#',
         onload: function (users) {
