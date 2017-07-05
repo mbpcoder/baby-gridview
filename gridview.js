@@ -5,20 +5,35 @@ var Gridview = function (options) {
     // options
     var $containerElement = $('#' + options.gridviewContainerId) || undefined;
 
-    var autoGridTemplate = options.autoGridTemplate || true;
-    var autoPagination = options.autoPagination || true;
+    var autoGridTemplate = (options.autoGridTemplate == undefined) ? true : options.autoGridTemplate;
+    var autoPagination = (options.autoPagination == undefined) ? true : options.autoPagination;
+    var manualPageChange = (options.manualPageChange == undefined) ? true : options.manualPageChange;
     var emptyDataTemplate = options.emptyDataTemplate || 'Empty Data';
 
     if ($containerElement) {
 
         $containerElement.on('click', 'ul.pagination li a', function (e) {
             var $this = $(this);
-            $containerElement.find('ul.pagination li').removeClass('active');
-            $this.closest('li').addClass('active');
-            pagination.current_page = parseInt($this.text());
-            pagination.from = ((pagination.current_page - 1) * pagination.per_page);
-            pagination.to = pagination.from + pagination.per_page;
-            send();
+            if (!$this.hasClass('disable')) {
+                $containerElement.find('ul.pagination li').removeClass('active');
+                $this.closest('li').addClass('active');
+                pagination.current_page = parseInt($this.text());
+                pagination.from = ((pagination.current_page - 1) * pagination.per_page);
+                pagination.to = pagination.from + pagination.per_page;
+                send();
+            }
+        });
+
+        $containerElement.on('keydown', 'ul.pagination .pagination-input', function (e) {
+            var $this = $(this);
+            if (!$this.hasClass('disable')) {
+                if (e.keyCode == 13) {
+                    pagination.current_page = parseInt($this.val());
+                    pagination.from = ((pagination.current_page - 1) * pagination.per_page);
+                    pagination.to = pagination.from + pagination.per_page;
+                    send();
+                }
+            }
         });
 
         $containerElement.on('click', '.js-sort-ascending', function (e) {
@@ -292,27 +307,50 @@ var Gridview = function (options) {
     };
     var createPagination = function () {
         if (autoPagination) {
-            var pageCount = pagination.total / pagination.per_page
-            if ((pagination.total % pagination.per_page) > 0) {
-                pageCount++;
+            console.log(pagination.total);
+            console.log(pagination.per_page);
+
+            var pageCount = Math.round(pagination.total / pagination.per_page);
+
+            var paginationLinkCount = 7;
+
+            var startPaginationNumber = pagination.current_page - 3;
+
+            if (startPaginationNumber <= 0) {
+                startPaginationNumber = 1;
+            } else if ((pageCount - pagination.current_page) < 3) {
+                startPaginationNumber = pagination.current_page - (paginationLinkCount - (pageCount - pagination.current_page) - 1);
+            }
+            var paginationHtml = '<ul class="pagination">';
+
+            paginationHtml += '<li><a href="javascript:void(0)" class="previous disable">«</a></li>';
+
+            for (var i = 1; i <= paginationLinkCount; i++) {
+
+                if (pagination.current_page == startPaginationNumber) {
+                    paginationHtml += '<li class="active"><a href="javascript:void(0)" class="disable">' + startPaginationNumber + '</a></li>';
+                } else {
+                    paginationHtml += '<li><a href="javascript:void(0)">' + startPaginationNumber + '</a></li>';
+                }
+                startPaginationNumber++;
             }
 
-            var paginationHtml = '<ul class="pagination">';
-            for (var i = 1; i <= pageCount; i++) {
-                if (pagination.current_page == i) {
-                    paginationHtml += '<li class="active"><a href="javascript:void(0)">' + i + '</a></li>';
-                } else {
-                    paginationHtml += '<li><a href="javascript:void(0)">' + i + '</a></li>';
-                }
+            paginationHtml += '<li><a href="javascript:void(0)" class="next disable">»</a></li>';
+            paginationHtml += '<li><span>Page Count: ' + pageCount + '</span></li>';
+            if (manualPageChange) {
+                paginationHtml += '<li><input class="pagination-input" type="number" placeholder="Page Number"></li>';
             }
             paginationHtml += '</ul>';
 
             return paginationHtml;
 
+        } else {
+            return "";
         }
     };
 
     // request
+
     var send = function () {
         var params = extraData;
         for (var index in columns) {
@@ -356,7 +394,6 @@ var Gridview = function (options) {
             onload(resultRows);
         });
     };
-
 
     // public function
     this.addColumn = addColumn;

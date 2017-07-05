@@ -54,7 +54,7 @@ table td, table th {
     display: inline;
 }
 
-#UsersGridView li a {
+#UsersGridView li a, #UsersGridView li span, #UsersGridView li input {
     text-decoration: none;
     color: #000;
     float: left;
@@ -101,5 +101,5 @@ table td, table th {
 }
 
 .mdi.mdi-sort-descending:after {
-    content:'^';
+    content: '^';
 }
