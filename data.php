@@ -5,6 +5,7 @@ $req = json_decode($_POST['req']);
 $filters = $req->filters;
 $sorts = $req->sorts;
 $pagination = $req->pagination;
+$pagination->per_page = 20;
 
 //var_dump($pagination);
 
