@@ -307,10 +307,8 @@ var Gridview = function (options) {
     };
     var createPagination = function () {
         if (autoPagination) {
-            console.log(pagination.total);
-            console.log(pagination.per_page);
 
-            var pageCount = Math.round(pagination.total / pagination.per_page);
+            var pageCount = Math.ceil(pagination.total / pagination.per_page);
 
             var paginationLinkCount = 7;
 
@@ -326,7 +324,9 @@ var Gridview = function (options) {
             paginationHtml += '<li><a href="javascript:void(0)" class="previous disable">«</a></li>';
 
             for (var i = 1; i <= paginationLinkCount; i++) {
-
+                if (i > pageCount) {
+                    break;
+                }
                 if (pagination.current_page == startPaginationNumber) {
                     paginationHtml += '<li class="active"><a href="javascript:void(0)" class="disable">' + startPaginationNumber + '</a></li>';
                 } else {
