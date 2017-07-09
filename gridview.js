@@ -89,8 +89,6 @@ var Gridview = function (options) {
 
     var addColumn = function (column) {
         columns[column.name] = column;
-        //columns.push(column);
-        //addFilter()
     };
     var removeColumn = function (name) {
         delete columns[name];
@@ -103,8 +101,37 @@ var Gridview = function (options) {
         if (value && value.constructor !== Array) {
             value = value.trim(value);
         }
+        empty(value);
         return value;
-
+    };
+    var empty = function (value) {
+        var isEmpty = false;
+        if (value == '' || value == undefined || value == null) {
+            isEmpty = true;
+        }
+        if (value instanceof Array && value.length == 0) {
+            isEmpty = true;
+        }
+        return isEmpty;
+    };
+    var equal = function (value1, value2) {
+        var isEqual = false;
+        if (value1 == value2) {
+            isEqual = true;
+        }
+        if (value1 instanceof Array && value2 instanceof Array) {
+            if (value1.length == value2.length) {
+                isEqual = true;
+                for (var i in value1) {
+                    var item = value1[i];
+                    if (!$.inArray(item, value2)) {
+                        isEqual = false;
+                        break;
+                    }
+                }
+            }
+        }
+        return isEqual;
     };
 
     // sorting
@@ -215,39 +242,6 @@ var Gridview = function (options) {
 
         html = '<thead><tr>' + html + '</tr></thead>';
         return html;
-
-        // Object Way
-        var $thead = $('<head>');
-        var $tr = $('<tr>');
-        if (autoIncrementColumn) {
-            $tr.append('<th>' + autoIncrementColumnName + '</th>')
-        }
-
-        for (var i in columns) {
-            var column = columns[i];
-
-            var $th = $('<th class="gridview-column-header-' + column.name + '">' + column.caption + '</th>');
-            switch (column.type) {
-                case 'hidden':
-                    $th.css('display', 'none');
-                    break;
-                case 'string':
-                case 'number':
-                    break;
-            }
-
-            if (column.sort) {
-                var $ascending = $('<i class="mdi mdi-sort-ascending pull-left js-sort-ascending"></i>')
-                var $descending = $('<i class="mdi mdi-sort-descending pull-left js-sort-descending"></i>')
-                $th.append($ascending);
-                $th.append($descending);
-            }
-
-
-            $tr.append($th);
-        }
-        $thead.append($th)
-        return $thead;
     };
     var createGridviewTable = function () {
         if (autoGridTemplate) {
@@ -355,10 +349,12 @@ var Gridview = function (options) {
         var params = extraData;
         for (var index in columns) {
             var column = columns[index];
+            var oprand1Value = undefined;
+            var oprand2Value = undefined;
             if (column.filter != undefined) {
                 if (column.filter.operator == 'between') {
-                    var oprand1Value = getValue(column.filter.oprand1.elementId);
-                    var oprand2Value = getValue(column.filter.oprand2.elementId);
+                    oprand1Value = getValue(column.filter.oprand1.elementId);
+                    oprand2Value = getValue(column.filter.oprand2.elementId);
 
                     if (oprand1Value && !oprand2Value && oprand1Value != column.filter.oprand1.ignoreValue) {
                         addFilterSmaller(column.name, column.type, oprand1Value)
@@ -371,11 +367,11 @@ var Gridview = function (options) {
                         removeFilter(column.name);
                     }
                 } else {
-                    var oprand1Value = getValue(column.filter.oprand1.elementId);
-                    if (oprand1Value && oprand1Value != column.filter.oprand1.ignoreValue) {
-                        addFilter(column.name, column.type, column.filter.operator, oprand1Value, undefined)
+                    oprand1Value = getValue(column.filter.oprand1.elementId);
+                    if (!empty(oprand1Value) && !equal(oprand1Value, column.filter.oprand1.ignoreValue)) {
+                        addFilter(column.name, column.type, column.filter.operator, oprand1Value, undefined);
                     } else {
-                        removeFilter(column.name)
+                        removeFilter(column.name);
                     }
                 }
             }
