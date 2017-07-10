@@ -216,7 +216,6 @@ var Gridview = function (options) {
             var th = '';
             switch (column.type) {
                 case 'hidden':
-                    th = '<th class="gridview-column-header-' + column.name + '" style="display: none">' + column.caption;
                     break;
                 case 'string':
                 case 'number':
@@ -286,7 +285,6 @@ var Gridview = function (options) {
             } else {
                 switch (column.type) {
                     case 'hidden':
-                        td = '<td class="gridview-column-' + column.name + '" style="display: none">' + row[column.name] + '</td>';
                         break;
                     case 'string':
                     case 'number':
