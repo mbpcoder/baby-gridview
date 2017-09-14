@@ -8,6 +8,7 @@ var Gridview = function (options) {
     var autoGridTemplate = (options.autoGridTemplate == undefined) ? true : options.autoGridTemplate;
     var autoPagination = (options.autoPagination == undefined) ? true : options.autoPagination;
     var manualPageChange = (options.manualPageChange == undefined) ? true : options.manualPageChange;
+    var showPageCount = (options.showPageCount == undefined) ? true : options.showPageCount;
     var emptyDataTemplate = options.emptyDataTemplate || 'Empty Data';
 
     if ($containerElement) {
@@ -187,12 +188,19 @@ var Gridview = function (options) {
     // Display Grid View
 
     var createGridView = function () {
+        if (autoPagination || autoGridTemplate) {
+        }
         if ($containerElement) {
             $containerElement.html('');
+
             var html = '<div class="' + gridviewClassName + ' table-responsive">';
-            html += createGridviewHeader();
-            html += createGridviewTable();
-            html += createPagination();
+            if (autoGridTemplate) {
+                html += createGridviewHeader();
+                html += createGridviewTable();
+            }
+            if (autoPagination) {
+                html += createPagination();
+            }
             html += '</div>';
             $containerElement.html(html);
         }
@@ -328,7 +336,9 @@ var Gridview = function (options) {
             }
 
             paginationHtml += '<li><a href="javascript:void(0)" class="next disable">»</a></li>';
-            paginationHtml += '<li><span>Page Count: ' + pageCount + '</span></li>';
+            if (showPageCount) {
+                paginationHtml += '<li><span>Page Count: ' + pageCount + '</span></li>';
+            }
             if (manualPageChange) {
                 paginationHtml += '<li><input class="pagination-input" type="number" placeholder="Page Number"></li>';
             }
