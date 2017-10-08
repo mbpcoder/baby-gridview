@@ -336,9 +336,12 @@ var Gridview = function (options) {
             }
 
             paginationHtml += '<li><a href="javascript:void(0)" class="next disable">»</a></li>';
+
             if (showPageCount) {
                 paginationHtml += '<li><span>Page Count: ' + pageCount + '</span></li>';
             }
+
+
             if (manualPageChange) {
                 paginationHtml += '<li><input class="pagination-input" type="number" placeholder="Page Number"></li>';
             }
@@ -395,7 +398,7 @@ var Gridview = function (options) {
             resultRows = result.data;
             pagination = result.pagination;
             createGridView();
-            onload(resultRows);
+            onload(resultRows , result);
         });
     };
 
